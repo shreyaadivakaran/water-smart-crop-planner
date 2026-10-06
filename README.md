@@ -36,14 +36,6 @@ The result is a **Pareto front** (crops that cannot be improved on one objective
 - Streamlit dashboard with Pareto chart, ranked table, water-savings view and plain-language explanation
 - A visible **synthetic data** banner whenever any input is generated rather than real
 
-## Screenshots
-
-> Add your screenshots to a `docs/` folder and update the file names below.
-
-| Pareto chart | Ranked table |
-|---|---|
-| ![Pareto chart](docs/pareto.png) | ![Ranked table](docs/ranked_table.png) |
-
 ## Architecture
 
 ```mermaid
