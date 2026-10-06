@@ -170,8 +170,4 @@ Python · pandas · NumPy · scikit-learn · XGBoost · pymoo · Plotly · Strea
 
 ## Author
 
-**Your Name** · [GitHub](https://github.com/<your-username>) · your.email@example.com
-
-## License
-
-Add a license of your choice (for example MIT) in a `LICENSE` file. If you reuse third-party datasets, check and follow their individual terms.
+Shreyashree Divakaran· https://github.com/shreyaadivakaran 
