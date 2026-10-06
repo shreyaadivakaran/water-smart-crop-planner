@@ -1,0 +1,134 @@
+# =============================================================================
+# Water-Smart Crop Planner — Master Configuration
+# Study district: Tiruvallur, Tamil Nadu, India
+# To adapt for another district, update the [district] section and data paths.
+# =============================================================================
+
+district:
+  name: Tiruvallur
+  state: Tamil Nadu
+  country: India
+  lat: 13.14
+  lon: 79.91
+
+study_period:
+  start_year: 2010
+  end_year: 2023
+
+crops:
+  # Candidate list — any crop with fewer than min_data_years usable seasons
+  # will be dropped automatically with a logged warning.
+  candidates:
+    - paddy
+    - groundnut
+    - sugarcane
+    - black_gram
+    - green_gram
+    - maize
+    - ragi
+  min_data_years: 8   # configurable; raise or lower as data quality allows
+
+seasons:
+  - kharif    # Jun–Sep
+  - rabi      # Oct–Jan
+  - summer    # Feb–May
+
+season_months:
+  kharif: [6, 7, 8, 9]
+  rabi:   [10, 11, 12, 1]
+  summer: [2, 3, 4, 5]
+
+# ---------------------------------------------------------------------------
+# Data sources
+# Set each use_synthetic flag to false when the corresponding real file is
+# ready. Datasets can be mixed (e.g. real weather + synthetic prices).
+# ---------------------------------------------------------------------------
+data:
+  use_synthetic:
+    weather:    true
+    yield:      true
+    prices:     true
+    crop_water: true
+    cost:       true
+
+  raw_dir:       data/raw
+  processed_dir: data/processed
+
+  # NASA POWER local cache — avoids repeated API calls
+  weather_cache: data/raw/weather_cache.json
+
+  # When true, augments Tiruvallur yield series with Kancheepuram district
+  # records for years <= 2019 (pre-administrative-split period).
+  # Merged rows are tagged source="merged" and a WARNING is logged.
+  merge_kancheepuram: true
+
+  # Reference markets for price data
+  price_markets:
+    - Koyambedu
+    - Tiruvallur
+
+# ---------------------------------------------------------------------------
+# NASA POWER API
+# ---------------------------------------------------------------------------
+nasa_power:
+  base_url: "https://power.larc.nasa.gov/api/temporal/daily/point"
+  community: AG
+  parameters:
+    - PRECTOTCORR
+    - T2M_MAX
+    - T2M_MIN
+    - RH2M
+    - WS2M
+    - ALLSKY_SFC_SW_DWN
+  sentinel_value: -999
+
+# ---------------------------------------------------------------------------
+# Models
+# ---------------------------------------------------------------------------
+models:
+  random_seed: 42
+  train_test_split_year: 2020   # train on years <= this; test on years > this
+
+  yield:
+    rf_n_estimators:    200
+    rf_max_depth:       10
+    xgb_n_estimators:   200
+    xgb_learning_rate:  0.05
+    xgb_max_depth:      6
+
+  price:
+    forecast_horizon_months: 6
+    quantiles: [0.10, 0.50, 0.90]   # P10 / P50 / P90
+    n_estimators: 200
+    learning_rate: 0.05
+
+# ---------------------------------------------------------------------------
+# Risk
+# ---------------------------------------------------------------------------
+risk:
+  dry_year_rainfall_percentile:    30    # years below this percentile = dry
+  yield_failure_threshold_fraction: 0.70  # < 70 % of mean yield = failure
+
+# ---------------------------------------------------------------------------
+# Optimisation (NSGA-II)
+# ---------------------------------------------------------------------------
+optimization:
+  population_size: 100
+  n_generations:   200
+  random_seed:     42
+
+# ---------------------------------------------------------------------------
+# Default objective weights (must sum to 1.0)
+# ---------------------------------------------------------------------------
+weights_default:
+  profit: 0.5
+  water:  0.3
+  risk:   0.2
+
+# ---------------------------------------------------------------------------
+# Outputs
+# ---------------------------------------------------------------------------
+outputs:
+  plots_dir:   outputs/plots
+  models_dir:  models
+  metrics_csv: outputs/model_metrics.csv
